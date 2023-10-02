@@ -1,0 +1,7 @@
+{
+  "name": "so2-oppimistehtava",
+  "main": "index.ts",
+  "scripts" : {
+    "start" : "npx nodemon index.ts"
+  }
+}
