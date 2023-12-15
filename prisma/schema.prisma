@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./data.db"
+}
+
+model Kommentti {
+  id             Int    @id @default(autoincrement())
+  uutisId        Int
+  kayttajatunnus String
+  kommentti      String
+  aikaleima      String
+}
+
+model Uutinen {
+  id      Int    @id @default(autoincrement())
+  otsikko String
+  sisalto String
+}
+
+model Kayttaja {
+  id             Int    @id @default(autoincrement())
+  kayttajatunnus String
+  salasana       String
+}

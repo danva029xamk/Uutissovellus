@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Oppimistehtävä 5: HENKILÖHAKEMISTO</h1>
+    
+    <p>Toteuta Node/Express/Prisma-tekniikoin palvelinsovellus (server) ja sille asiakassovellus (client) React/MUI –tekniikoin yrityksen henkilöstön yhteystietojen näyttämiseen. Kaikki tiedot ja kuvat (lataa tiedostopaketti tästä) sijaitsevat ainoastaan palvelinsovelluksessa.
+
+        Palvelinsovellus toimii REST API-sovelluksena, joka käyttää tiedonsiirtoon json-muotoista dataa (pois lukien kuvat). Asiakassovellus puolestaan keskustelee palvelinsovelluksen kanssa ja hoitaa käyttöliittymän toiminnallisuudet. 
+        
+        Toteuta molemmat sovellukset tähän GitHub-repositorioon ja palauta määräaikaan mennessä esimerkin mukainen tehtäväraportti pdf-muodossa.
+        
+        Sovelluksen perusvaatimukset (2 pistettä):
+        
+        Palvelinsovellus toimii itsenäisenä REST API -palvelimena portissa 3105. Asiakassovellus toimii puolestaan itsenäisesti portissa 3000 (React-kehitysympäristön oletus). Sovellusten tulee olla erillisiä, ei samassa portissa, mutta kuitenkin yhteisessä koodipohjassa/Git-repositoriossa. 
+        Henkilöstön tiedot sijaitsevat osana palvelinkoodeja (Prisma ORM/SQLite). Asiakassovellus pääsee tietoihin ainoastaan REST-reittien kautta. Voit nimetä reitit vapaasti.
+        Asiakassovelluksen käyttöliittymässä näytetään listaus kaikista tiedoston henkilöistä. Listan tulee perustua MUI-frameworkin List-elementteihin.  Jokaisesta henkilöstä näytetään koko nimi (ListItemText, primary) ja titteli (ListItemText, secondary) 
+        Jokaisen henkilön kohdalla listassa on myös henkilön kuva (ListItemAvatar). Kuvatiedostot sijaitsevat staattisina tiedostoina palvelimella. (Ei siis osana client-koodeja, ole tarkkana tässä!)
+        Asiakassovelluksen yhteys palvelimeen on toteutettu vikasietoisesti ja käyttöliittymässä näytetään virheilmoitus tarpeen mukaan. Käsittele vähintään virheet, jossa: palvelimeen ei saada yhteyttä tai palvelimelta ei löydy henkilötietoja (http-status 404).
+        Lisävaatimuksia sovellukselle (1 lisäpiste):
+        
+        Listasta voi klikata tarkemmat tiedot kustakin henkilöstä. Tämä toteutetaan MUI:n Dialog-elementillä. 
+        Avautuvassa dialogissa näytetään henkilön kuva, koko nimi, titteli, puhelinnumero, sähköpostiosoite ja työsuhteen kesto kokonaisina vuosina. Muotoile dialogin sisältö vapaasti.
+        Vinkki lisävaatimuksiin: Kannattaa miettiä, tarvitseeko palvelimelle tehdä useampia pyyntöjä...
+        Maksimipisteet: 3 p. Osittain perusvaatimuksiin vastaavasta toteutuksesta on mahdollista saada 1 piste, mikäli ongelmakohtia on käsitelty raportissa</p>
+</body>
+</html>
