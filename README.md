@@ -1,0 +1,1 @@
+Uutissovellus, jossa uutisia voi kommentoida. Sovellukseen voi rekisteröityä ja rekisteröitymisen jälkeen käyttäjällä voi kirjautua ja kommentoida uutisia heti.
