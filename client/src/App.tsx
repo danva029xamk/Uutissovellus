@@ -19,22 +19,26 @@ const App : React.FC = () : React.ReactElement => {
 
   return (
     <Container>
-      <Typography variant="h5">Uutiset</Typography>
-      {token ? (
-        <Button onClick={handleLogout}>Kirjaudu ulos</Button>
-      ) : (
-        <>
-          <Button onClick={() => navigate('/rekisteroidy')} style={{ marginLeft: '10px' }}>Rekisteröidy</Button>
-        </>
-      )}
-      <Routes>
-        <Route path='/' element={<Navigate replace to="/uutiset" />} />
-        <Route path='/uutiset' element={<Uutinen token={token} />} />
-        <Route path='/auth/login' element={<Login setToken={setToken} />} />
-        <Route path='/rekisteroidy' element={<Rekisterointi />} />
-      </Routes>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0' }}>
+                <Typography variant="h4">Uutiset</Typography>
+                {token ? (
+                    <Button onClick={handleLogout} variant="contained" color="secondary" size="medium">
+                        Kirjaudu ulos
+                    </Button>
+                ) : (
+                    <Button onClick={() => navigate('/rekisteroidy')} variant="contained" color="primary" size="medium">
+                        Rekisteröidy
+                    </Button>
+                )}
+            </div>
+        <Routes>
+            <Route path='/' element={<Navigate replace to="/uutiset" />} />
+            <Route path='/uutiset' element={<Uutinen token={token} />} />
+            <Route path='/auth/login' element={<Login setToken={setToken} />} />
+            <Route path='/rekisteroidy' element={<Rekisterointi />} />
+        </Routes>
     </Container>
-  );
+);
 };
 
 export default App;

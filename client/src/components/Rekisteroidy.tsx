@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { TextField, Button, Container, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const Rekisterointi = () => {
@@ -29,11 +29,29 @@ const Rekisterointi = () => {
     };
 
     return (
-        <div>
-            <TextField label="Käyttäjätunnus" value={kayttajatunnus} onChange={(e) => setKayttajatunnus(e.target.value)} />
-            <TextField label="Salasana" type="password" value={salasana} onChange={(e) => setSalasana(e.target.value)} />
-            <Button onClick={rekisteroi}>Rekisteröidy</Button>
-        </div>
+        <Container>
+            <Typography variant="h6" style={{ marginTop: '20px' }}>Rekisteröidy</Typography>
+            <div style={{ margin: '20px 0' }}>
+                <TextField 
+                    label="Käyttäjätunnus" 
+                    value={kayttajatunnus} 
+                    onChange={(e) => setKayttajatunnus(e.target.value)} 
+                    fullWidth 
+                    margin="normal" 
+                />
+                <TextField 
+                    label="Salasana" 
+                    type="password" 
+                    value={salasana} 
+                    onChange={(e) => setSalasana(e.target.value)} 
+                    fullWidth 
+                    margin="normal" 
+                />
+                <Button onClick={rekisteroi} variant="contained" color="primary" style={{ marginTop: '10px' }}>
+                    Rekisteröidy
+                </Button>
+            </div>
+        </Container>
     );
 };
 

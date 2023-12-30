@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, CardContent, CardHeader, Button, List, ListItem, TextField } from '@mui/material';
+import { Container, Typography, Card, CardContent, CardHeader, Button, List, ListItem, Stack, TextField, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 interface Uutinen {
@@ -17,15 +17,15 @@ interface Kommentti {
 }
 
 interface UutisetProps {
-    token : string;
+    token: string;
 }
 
-const Uutiset: React.FC<UutisetProps> = ({token}) => {
+const Uutiset: React.FC<UutisetProps> = ({ token }) => {
     const [uutiset, setUutiset] = useState<Uutinen[]>([]);
-    const [kommentit, setKommentit] = useState<Kommentti[]>([]);
+    const [kommentit, setKommentit] = useState<{ [key: number]: Kommentti[] }>({});
     const [uusiKommentti, setUusiKommentti] = useState('');
+    const [aktiivinenUutisId, setAktiivinenUutisId] = useState<number | null>(null);
     const navigate = useNavigate();
-
 
     useEffect(() => {
         const haeUutiset = async () => {
@@ -43,32 +43,36 @@ const Uutiset: React.FC<UutisetProps> = ({token}) => {
     }, []);
 
     useEffect(() => {
-        // Oletetaan, että ensimmäinen uutinen on aina olemassa
-        const ensimmainenUutinenId = uutiset[0]?.id;
-        if (ensimmainenUutinenId) {
-            const haeKommentit = async () => {
-                const vastaus = await fetch(`/api/kommentit/${ensimmainenUutinenId}`);
-                if (vastaus.ok) {
-                    const kommentitData = await vastaus.json();
-                    setKommentit(kommentitData);
-                }
-            };
-            haeKommentit();
-        }
+        uutiset.forEach(uutinen => {
+            fetch(`/api/kommentit/${uutinen.id}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Virhe kommenttien haussa');
+                })
+                .then(data => {
+                    setKommentit(prevKommentit => ({
+                        ...prevKommentit,
+                        [uutinen.id]: data
+                    }));
+                })
+                .catch(error => {
+                    console.error('Virhe kommenttien haussa:', error);
+                });
+        });
     }, [uutiset]);
 
     const lahetaKommentti = async () => {
-
         const kayttajatunnus = localStorage.getItem("kayttajatunnus");
-        const uutisId = uutiset[0].id;
 
-        if (!uusiKommentti.trim()) {
+        if (!aktiivinenUutisId || !uusiKommentti.trim()) {
             alert('Kommentti ei voi olla tyhjä');
             return;
         }
 
         try {
-            const vastaus = await fetch(`/api/kommentit/${uutiset[0].id}`, {
+            const vastaus = await fetch(`/api/kommentit/${aktiivinenUutisId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,15 +81,19 @@ const Uutiset: React.FC<UutisetProps> = ({token}) => {
                 body: JSON.stringify({
                     kayttajatunnus,  
                     kommentti: uusiKommentti,
-                    aikaleima: new Date().toLocaleString(),
-                    uutisId
-                    })
+                    aikaleima: new Date().toISOString(),
+                    uutisId: aktiivinenUutisId
+                })
             });
 
             if (vastaus.ok) {
                 const lisattyKommentti = await vastaus.json();
-                setKommentit([...kommentit, lisattyKommentti]);
+                setKommentit(prevKommentit => ({
+                    ...prevKommentit,
+                    [aktiivinenUutisId]: [...prevKommentit[aktiivinenUutisId] || [], lisattyKommentti]
+                }));
                 setUusiKommentti('');
+                setAktiivinenUutisId(null);
             } else {
                 alert('Kommentin lähettäminen epäonnistui');
             }
@@ -98,59 +106,79 @@ const Uutiset: React.FC<UutisetProps> = ({token}) => {
         return <Typography variant="body1">Ei uutisia saatavilla.</Typography>;
     }
 
-    const ensimmainenUutinen = uutiset[0];
-
     return (
-        <Container>
-            <Card>
-                <CardHeader title={ensimmainenUutinen.otsikko} />
-                <CardContent>
-                    <Typography variant="body1">{ensimmainenUutinen.sisalto}</Typography>
-                    <List>
-                        {kommentit.map(k => (
-                            <ListItem key={k.id}>
-                                <Typography variant="body2">
-                                    {k.kommentti} - {k.kayttajatunnus}, 
-                                    {new Date(k.aikaleima).toLocaleDateString()} 
-                                    {new Date(k.aikaleima).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, 
-                                    Uutisen id: {k.uutisId}</Typography>
-                            </ListItem>
-                        ))}
-                    </List>
-                    {token && (
-                        <>
-                            <TextField
-                                label="Kommentti"
-                                multiline
-                                rows={4}
-                                value={uusiKommentti}
-                                onChange={(e) => setUusiKommentti(e.target.value)}
-                                variant="outlined"
-                                fullWidth
-                                margin="normal"
-                            />
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={lahetaKommentti}
+            <Container>
+                {uutiset.map(uutinen => (
+                    <Card key={uutinen.id} sx={{ marginBottom: 2, borderRadius: 2, elevation: 4 }}>
+                        <CardHeader 
+                            title={uutinen.otsikko}
+                            titleTypographyProps={{ variant: "h5" }}
+                            sx={{ backgroundColor: '#f5f5f5' }} 
+                        />
+                        <CardContent>
+                            <Typography variant="body1" gutterBottom>{uutinen.sisalto}</Typography>
+                            <List>
+                                {kommentit[uutinen.id]?.map(k => (
+                                    <ListItem key={k.id} sx={{ border: 1, borderColor: 'grey.300', borderRadius: 2, mb: 1, backgroundColor: '#fafafa' }}>
+                                        <Stack spacing={1} sx={{ width: '100%' }}>
+                                            <Typography variant="body2" component="p">
+                                                {k.kommentti}
+                                            </Typography>
+        
+                                            <Grid container justifyContent="space-between">
+                                                <Grid item>
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        {k.kayttajatunnus}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item>
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        {new Date(k.aikaleima).toLocaleDateString()} {new Date(k.aikaleima).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Stack>
+                                    </ListItem>
+                                ))}
+                            </List>
+                            {token && (
+                                <>
+                                    <TextField
+                                        label="Kommentti"
+                                        multiline
+                                        rows={4}
+                                        value={uusiKommentti}
+                                        onChange={(e) => {
+                                            setUusiKommentti(e.target.value);
+                                            setAktiivinenUutisId(uutinen.id);
+                                        }}
+                                        variant="outlined"
+                                        fullWidth
+                                        margin="normal"
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={lahetaKommentti}
+                                    >
+                                        Lähetä kommentti
+                                    </Button>
+                                </>
+                            )}
+                        {!token && (
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                onClick={() => navigate('/auth/login')}
                             >
-                                Lähetä kommentti
+                                Kirjaudu sisään kommentoidaksesi
                             </Button>
-                        </>
-                    )}
-                {!token && (
-                    <Button 
-                        variant="contained" 
-                        color="primary" 
-                        onClick={() => navigate('/auth/login')}
-                    >
-                        Kirjaudu sisään kommentoidaksesi
-                    </Button>
-                )}
-                </CardContent>
-            </Card>
-        </Container>
+                        )}
+                        </CardContent>
+                    </Card>
+                ))}
+            </Container>
     );
-};
+}
 
 export default Uutiset;
